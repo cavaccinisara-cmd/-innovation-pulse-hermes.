@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from pyvis.network import Network
@@ -38,13 +37,25 @@ logo_b64 = img_to_base64(LOGO_FILE)
 
 st.markdown("""
 <style>
+:root {
+    color-scheme: light !important;
+}
+
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+* {
+    color-scheme: light !important;
+}
+
 .stApp {
     background:
         radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.18), transparent 28%),
         radial-gradient(circle at 86% 18%, rgba(14, 165, 233, 0.20), transparent 30%),
-        radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.10), transparent 36%),
-        linear-gradient(135deg, #ffffff 0%, #f5f9ff 45%, #eaf4ff 100%);
-    color: #0f172a;
+        linear-gradient(135deg, #ffffff 0%, #f5f9ff 45%, #eaf4ff 100%) !important;
+    color: #0f172a !important;
 }
 
 html, body, [class*="css"] {
@@ -61,8 +72,12 @@ html, body, [class*="css"] {
     max-width: 1400px;
 }
 
+p, span, div, label, h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+}
+
 .hero {
-    background: rgba(255,255,255,0.96);
+    background: rgba(255,255,255,0.98);
     border: 1px solid rgba(37,99,235,0.22);
     border-radius: 34px;
     padding: 2.4rem;
@@ -80,7 +95,7 @@ html, body, [class*="css"] {
     padding: 0.45rem 0.85rem;
     border-radius: 999px;
     background: linear-gradient(90deg, #0b4f8a, #0284c7);
-    color: white;
+    color: white !important;
     font-size: 0.78rem;
     font-weight: 850;
     letter-spacing: 0.08em;
@@ -90,19 +105,19 @@ html, body, [class*="css"] {
 .main-title {
     font-size: clamp(2.6rem, 6vw, 5.8rem);
     font-weight: 950;
-    color: #0f172a;
+    color: #0f172a !important;
     line-height: 0.95;
     margin-bottom: 0.8rem;
 }
 
 .subtitle {
     font-size: clamp(1.05rem, 2vw, 1.45rem);
-    color: #334155;
+    color: #334155 !important;
     max-width: 1000px;
 }
 
 .card {
-    background: rgba(255,255,255,0.96);
+    background: rgba(255,255,255,0.98);
     border: 1px solid rgba(148,163,184,0.35);
     border-radius: 28px;
     padding: 1.5rem;
@@ -142,27 +157,25 @@ html, body, [class*="css"] {
 .metric-number {
     font-size: 2.15rem;
     font-weight: 950;
-    color: #0b4f8a;
+    color: #0b4f8a !important;
 }
 
 .metric-label {
-    color: #475569;
+    color: #475569 !important;
     font-size: 0.92rem;
-}
-
-.highlight {
-    font-size: clamp(1.2rem, 2vw, 1.8rem);
-    font-weight: 850;
-    color: #0b4f8a;
 }
 
 .quote-box {
     background: linear-gradient(135deg, #0b4f8a, #0284c7);
-    color: white;
+    color: white !important;
     border-radius: 28px;
     padding: 1.6rem;
     box-shadow: 0 18px 42px rgba(2,132,199,0.23);
     margin-bottom: 1rem;
+}
+
+.quote-box * {
+    color: white !important;
 }
 
 .quote-text {
@@ -185,10 +198,14 @@ html, body, [class*="css"] {
     padding: 1rem 1rem;
     font-weight: 900;
     font-size: 1.02rem;
-    background: linear-gradient(90deg, #0b4f8a, #0284c7);
+    background: linear-gradient(90deg, #0b4f8a, #0284c7) !important;
     color: white !important;
     border: none;
     box-shadow: 0 14px 30px rgba(2,132,199,0.25);
+}
+
+.stButton > button * {
+    color: white !important;
 }
 
 .stButton > button:hover {
@@ -196,22 +213,44 @@ html, body, [class*="css"] {
     box-shadow: 0 18px 38px rgba(2,132,199,0.32);
 }
 
-label, .stRadio label, .stTextArea label {
+label, [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
     color: #0f172a !important;
-    font-weight: 700 !important;
+    font-weight: 750 !important;
 }
 
 textarea, input {
     color: #0f172a !important;
     background-color: #ffffff !important;
+    border-color: #bfdbfe !important;
 }
 
-div[role="radiogroup"] label {
-    background: white;
-    border: 1px solid #dbeafe;
-    border-radius: 14px;
-    padding: 0.45rem 0.75rem;
-    margin-bottom: 0.35rem;
+/* Selectbox stabile anche in dark mode */
+[data-baseweb="select"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+[data-baseweb="select"] * {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+}
+
+[data-baseweb="popover"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+[data-baseweb="popover"] * {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+}
+
+[role="listbox"], [role="option"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
 }
 
 .nav-row {
@@ -226,7 +265,7 @@ div[role="radiogroup"] label {
     border-radius: 999px;
     background: white;
     border: 1px solid #bfdbfe;
-    color: #0b4f8a;
+    color: #0b4f8a !important;
     font-weight: 800;
 }
 
@@ -234,39 +273,6 @@ div[role="radiogroup"] label {
     .hero { padding: 1.25rem; border-radius: 24px; }
     .card { padding: 1rem; border-radius: 22px; }
     .logo-img { max-width: 220px; }
-}
-:root {
-    color-scheme: light !important;
-}
-
-html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-}
-
-* {
-    color-scheme: light !important;
-}
-
-p, span, div, label, h1, h2, h3, h4, h5, h6 {
-    color: #0f172a;
-}
-
-.stMarkdown, .stText, .stRadio, .stTextArea, .stTabs {
-    color: #0f172a !important;
-}
-
-textarea, input, select {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border-color: #bfdbfe !important;
-}
-
-div[role="radiogroup"] label,
-[data-testid="stTextArea"] textarea,
-[data-testid="stWidgetLabel"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -500,18 +506,20 @@ elif page == "participate":
         st.markdown('<div class="card blue-card">', unsafe_allow_html=True)
         st.subheader("Il tuo profilo")
 
-        ambito = st.radio("Secondo te, quale ambito cambierà di più il mondo nei prossimi anni?", [
-            "Intelligenza artificiale", "Energia", "Salute", "Ambiente", "Industria", "Cultura"
-        ])
+        ambito = st.selectbox(
+            "Secondo te, quale ambito cambierà di più il mondo nei prossimi anni?",
+            ["Intelligenza artificiale", "Energia", "Salute", "Ambiente", "Industria", "Cultura"]
+        )
 
-        problema = st.radio("Quale problema dovrebbe risolvere prima l’innovazione?", [
-            "Crisi climatica", "Disuguaglianze", "Lavoro e automazione", "Sanità",
-            "Sicurezza", "Sostenibilità produttiva", "Qualità della vita"
-        ])
+        problema = st.selectbox(
+            "Quale problema dovrebbe risolvere prima l’innovazione?",
+            ["Crisi climatica", "Disuguaglianze", "Lavoro e automazione", "Sanità", "Sicurezza", "Sostenibilità produttiva", "Qualità della vita"]
+        )
 
-        rapporto = st.radio("Che rapporto hai con l’innovazione?", [
-            "Entusiasmo", "Curiosità", "Fiducia cauta", "Paura", "Scetticismo"
-        ])
+        rapporto = st.selectbox(
+            "Che rapporto hai con l’innovazione?",
+            ["Entusiasmo", "Curiosità", "Fiducia cauta", "Paura", "Scetticismo"]
+        )
 
         frase = st.text_area(
             "In una frase, racconta quale futuro immagini grazie all’innovazione.",
