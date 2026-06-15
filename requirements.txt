@@ -1,0 +1,8 @@
+streamlit
+pyvis
+networkx
+pandas
+matplotlib
+wordcloud
+streamlit-autorefresh
+qrcode[pil]
