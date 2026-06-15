@@ -27,11 +27,13 @@ COLUMNS = ["timestamp", "ambito", "problema", "rapporto", "frase", "sentiment", 
 if not os.path.exists(DATA_FILE):
     pd.DataFrame(columns=COLUMNS).to_csv(DATA_FILE, index=False)
 
+
 def img_to_base64(path):
     if not os.path.exists(path):
         return ""
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
+
 
 logo_b64 = img_to_base64(LOGO_FILE)
 
@@ -208,11 +210,6 @@ p, span, div, label, h1, h2, h3, h4, h5, h6 {
     color: white !important;
 }
 
-.stButton > button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 18px 38px rgba(2,132,199,0.32);
-}
-
 label, [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
     color: #0f172a !important;
     font-weight: 750 !important;
@@ -224,33 +221,24 @@ textarea, input {
     border-color: #bfdbfe !important;
 }
 
-/* Selectbox stabile anche in dark mode */
-[data-baseweb="select"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-}
-
-[data-baseweb="select"] * {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    -webkit-text-fill-color: #0f172a !important;
-}
-
-[data-baseweb="popover"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-}
-
-[data-baseweb="popover"] * {
+/* PILLS: soluzione stabile per Safari dark mode */
+[data-testid="stPills"] button,
+[data-testid="stPills"] button *,
+[data-baseweb="button-group"] button,
+[data-baseweb="button-group"] button * {
     background-color: #ffffff !important;
     color: #0f172a !important;
     -webkit-text-fill-color: #0f172a !important;
+    border: 1px solid #bfdbfe !important;
 }
 
-[role="listbox"], [role="option"] {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    -webkit-text-fill-color: #0f172a !important;
+[data-testid="stPills"] button[aria-pressed="true"],
+[data-testid="stPills"] button[aria-pressed="true"] *,
+[data-baseweb="button-group"] button[aria-pressed="true"],
+[data-baseweb="button-group"] button[aria-pressed="true"] * {
+    background-color: #0b4f8a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 .nav-row {
@@ -286,8 +274,18 @@ nel nella nei nelle mi ti ci vi si io tu lui lei noi voi loro
 innovazione futuro mondo anni grazie cosa quale secondo te
 """.split())
 
-POSITIVE_WORDS = {"fiducia","speranza","migliore","migliorare","opportunità","crescita","progresso","cura","benessere","sostenibile","sostenibilità","aiuto","collaborazione","accessibile","qualità","vita","soluzioni","pace"}
-NEGATIVE_WORDS = {"paura","rischio","rischi","crisi","problema","problemi","ansia","disuguaglianze","pericolo","insicurezza","sostituire","perdere","controllo","climatica","guerra","povertà"}
+POSITIVE_WORDS = {
+    "fiducia", "speranza", "migliore", "migliorare", "opportunità", "crescita",
+    "progresso", "cura", "benessere", "sostenibile", "sostenibilità", "aiuto",
+    "collaborazione", "accessibile", "qualità", "vita", "soluzioni", "pace"
+}
+
+NEGATIVE_WORDS = {
+    "paura", "rischio", "rischi", "crisi", "problema", "problemi", "ansia",
+    "disuguaglianze", "pericolo", "insicurezza", "sostituire", "perdere",
+    "controllo", "climatica", "guerra", "povertà"
+}
+
 
 def get_query_param():
     try:
@@ -295,9 +293,11 @@ def get_query_param():
     except Exception:
         return "home"
 
+
 def set_page(page):
     st.query_params["page"] = page
     st.rerun()
+
 
 def clean_words(text):
     text = str(text).lower()
@@ -305,32 +305,39 @@ def clean_words(text):
     words = [w.strip() for w in text.split() if len(w.strip()) > 2]
     return [w for w in words if w not in STOPWORDS]
 
+
 def extract_keywords(text, top_n=5):
     words = clean_words(text)
     if not words:
         return []
     return [w for w, c in Counter(words).most_common(top_n)]
 
+
 def simple_sentiment(text, rapporto):
     words = clean_words(text)
     score = 0
+
     for w in words:
         if w in POSITIVE_WORDS:
             score += 1
         if w in NEGATIVE_WORDS:
             score -= 1
+
     if rapporto in ["Entusiasmo", "Curiosità"]:
         score += 1
     elif rapporto in ["Paura", "Scetticismo"]:
         score -= 1
+
     if score > 0:
         return "positivo"
     if score < 0:
         return "critico"
     return "neutro"
 
+
 def load_data():
     return pd.read_csv(DATA_FILE)
+
 
 def save_response(ambito, problema, rapporto, frase, sentiment, keywords):
     df = load_data()
@@ -345,30 +352,44 @@ def save_response(ambito, problema, rapporto, frase, sentiment, keywords):
     }])
     pd.concat([df, new], ignore_index=True).to_csv(DATA_FILE, index=False)
 
+
 def logo_html():
     if logo_b64:
         return f'<img class="logo-img" src="data:image/png;base64,{logo_b64}">'
     return '<div class="badge">HERMES LAB</div>'
+
 
 def top_value(df, col):
     if df.empty:
         return "-"
     return df[col].value_counts().idxmax()
 
+
 def frase_momento(df):
     if df.empty or df["frase"].dropna().empty:
         return "La mappa collettiva prenderà forma con le prime risposte dei partecipanti."
+
     frasi = [f for f in df["frase"].dropna().astype(str).tolist() if len(f.strip()) > 20]
+
     if not frasi:
         return "Ogni contributo aggiunge un nodo alla mappa dell’innovazione."
+
     return random.choice(frasi)
+
 
 def build_network(df, height="720px"):
     if df.empty:
         st.info("Il grafo si genererà dopo le prime risposte.")
         return
 
-    net = Network(height=height, width="100%", bgcolor="#ffffff", font_color="#0f172a", directed=False)
+    net = Network(
+        height=height,
+        width="100%",
+        bgcolor="#ffffff",
+        font_color="#0f172a",
+        directed=False
+    )
+
     net.barnes_hut(gravity=-6200, central_gravity=0.25, spring_length=180)
 
     center = "Innovation Pulse"
@@ -409,15 +430,20 @@ def build_network(df, height="720px"):
             net.add_edge(problema, kw)
 
     net.save_graph("innovation_graph.html")
+
     with open("innovation_graph.html", "r", encoding="utf-8") as f:
         graph_html = f.read()
-    components.html(graph_html, height=int(height.replace("px","")) + 40, scrolling=True)
+
+    components.html(graph_html, height=int(height.replace("px", "")) + 40, scrolling=True)
+
 
 def plot_bar(df, column, title):
     if df.empty:
         st.info("Ancora nessuna risposta raccolta.")
         return
+
     counts = df[column].value_counts()
+
     fig, ax = plt.subplots(figsize=(8, 4.3))
     counts.plot(kind="bar", ax=ax)
     ax.set_title(title)
@@ -426,20 +452,31 @@ def plot_bar(df, column, title):
     ax.tick_params(axis="x", rotation=30)
     st.pyplot(fig)
 
+
 def show_wordcloud(df):
     if df.empty:
         st.info("La nuvola apparirà dopo le prime risposte.")
         return
+
     text = " ".join(df["frase"].dropna().astype(str).tolist())
     words = clean_words(text)
+
     if not words:
         st.info("Servono più parole per generare la nuvola.")
         return
-    wc = WordCloud(width=1100, height=430, background_color="white", colormap="Blues").generate(" ".join(words))
+
+    wc = WordCloud(
+        width=1100,
+        height=430,
+        background_color="white",
+        colormap="Blues"
+    ).generate(" ".join(words))
+
     fig, ax = plt.subplots(figsize=(11, 4.5))
     ax.imshow(wc, interpolation="bilinear")
     ax.axis("off")
     st.pyplot(fig)
+
 
 page = get_query_param()
 
@@ -450,6 +487,7 @@ st.markdown("""
     <div class="nav-pill">NLP · Sentiment · Semantic Graph</div>
 </div>
 """, unsafe_allow_html=True)
+
 
 if page == "home":
     df = load_data()
@@ -468,22 +506,43 @@ if page == "home":
     """, unsafe_allow_html=True)
 
     b1, b2 = st.columns(2)
+
     with b1:
-        st.markdown('<div class="big-button-card"><h2>Partecipa</h2><p>Compila il questionario e genera il tuo profilo dell’innovazione.</p></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="big-button-card"><h2>Partecipa</h2><p>Compila il questionario e genera il tuo profilo dell’innovazione.</p></div>',
+            unsafe_allow_html=True
+        )
         if st.button("Apri questionario"):
             set_page("participate")
+
     with b2:
-        st.markdown('<div class="big-button-card"><h2>Innovation Pulse</h2><p>Visualizza il grafo collettivo che si aggiorna live durante l’evento.</p></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="big-button-card"><h2>Innovation Pulse</h2><p>Visualizza il grafo collettivo che si aggiorna live durante l’evento.</p></div>',
+            unsafe_allow_html=True
+        )
         if st.button("Apri mappa live"):
             set_page("wall")
 
     c1, c2, c3 = st.columns(3)
+
     with c1:
-        st.markdown(f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>',
+            unsafe_allow_html=True
+        )
+
     with c2:
-        st.markdown('<div class="metric-card"><div class="metric-number">6</div><div class="metric-label">ambiti monitorati</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="metric-card"><div class="metric-number">6</div><div class="metric-label">ambiti monitorati</div></div>',
+            unsafe_allow_html=True
+        )
+
     with c3:
-        st.markdown('<div class="metric-card"><div class="metric-number">AI</div><div class="metric-label">analisi testuale</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div class="metric-card"><div class="metric-number">AI</div><div class="metric-label">analisi testuale</div></div>',
+            unsafe_allow_html=True
+        )
+
 
 elif page == "participate":
     st.markdown(f"""
@@ -506,19 +565,22 @@ elif page == "participate":
         st.markdown('<div class="card blue-card">', unsafe_allow_html=True)
         st.subheader("Il tuo profilo")
 
-        ambito = st.selectbox(
+        ambito = st.pills(
             "Secondo te, quale ambito cambierà di più il mondo nei prossimi anni?",
-            ["Intelligenza artificiale", "Energia", "Salute", "Ambiente", "Industria", "Cultura"]
+            ["Intelligenza artificiale", "Energia", "Salute", "Ambiente", "Industria", "Cultura"],
+            default="Intelligenza artificiale"
         )
 
-        problema = st.selectbox(
+        problema = st.pills(
             "Quale problema dovrebbe risolvere prima l’innovazione?",
-            ["Crisi climatica", "Disuguaglianze", "Lavoro e automazione", "Sanità", "Sicurezza", "Sostenibilità produttiva", "Qualità della vita"]
+            ["Crisi climatica", "Disuguaglianze", "Lavoro e automazione", "Sanità", "Sicurezza", "Sostenibilità produttiva", "Qualità della vita"],
+            default="Crisi climatica"
         )
 
-        rapporto = st.selectbox(
+        rapporto = st.pills(
             "Che rapporto hai con l’innovazione?",
-            ["Entusiasmo", "Curiosità", "Fiducia cauta", "Paura", "Scetticismo"]
+            ["Entusiasmo", "Curiosità", "Fiducia cauta", "Paura", "Scetticismo"],
+            default="Curiosità"
         )
 
         frase = st.text_area(
@@ -536,6 +598,7 @@ elif page == "participate":
                 save_response(ambito, problema, rapporto, frase, sentiment, keywords)
 
                 st.success("Risposta aggiunta alla mappa collettiva.")
+
                 st.markdown(f"""
                 <div class="result-box">
                     <h3>Il tuo profilo dell’innovazione</h3>
@@ -551,18 +614,28 @@ elif page == "participate":
 
     with right:
         df = load_data()
+
         st.markdown('<div class="card cyan-card">', unsafe_allow_html=True)
         st.subheader("Anteprima Innovation Pulse")
 
         c1, c2 = st.columns(2)
+
         with c1:
-            st.markdown(f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>',
+                unsafe_allow_html=True
+            )
+
         with c2:
             top = top_value(df, "ambito")
-            st.markdown(f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top))}</div><div class="metric-label">ambito più scelto</div></div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top))}</div><div class="metric-label">ambito più scelto</div></div>',
+                unsafe_allow_html=True
+            )
 
         build_network(df, height="520px")
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 elif page == "wall":
     st_autorefresh(interval=5000, key="refresh_live")
@@ -588,14 +661,30 @@ elif page == "wall":
     frase = frase_momento(df)
 
     c1, c2, c3, c4 = st.columns(4)
+
     with c1:
-        st.markdown(f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="metric-card"><div class="metric-number">{len(df)}</div><div class="metric-label">partecipanti</div></div>',
+            unsafe_allow_html=True
+        )
+
     with c2:
-        st.markdown(f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_ambito))}</div><div class="metric-label">tema emergente</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_ambito))}</div><div class="metric-label">tema emergente</div></div>',
+            unsafe_allow_html=True
+        )
+
     with c3:
-        st.markdown(f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_prob))}</div><div class="metric-label">priorità collettiva</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_prob))}</div><div class="metric-label">priorità collettiva</div></div>',
+            unsafe_allow_html=True
+        )
+
     with c4:
-        st.markdown(f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_sent))}</div><div class="metric-label">sentiment prevalente</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="metric-card"><div class="metric-number" style="font-size:1rem;">{html.escape(str(top_sent))}</div><div class="metric-label">sentiment prevalente</div></div>',
+            unsafe_allow_html=True
+        )
 
     st.markdown(f"""
     <div class="quote-box">
@@ -609,11 +698,15 @@ elif page == "wall":
     st.markdown('</div>', unsafe_allow_html=True)
 
     tab1, tab2, tab3, tab4 = st.tabs(["Ambiti", "Problemi", "Rapporto", "Parole"])
+
     with tab1:
         plot_bar(df, "ambito", "Ambiti che cambieranno di più il mondo")
+
     with tab2:
         plot_bar(df, "problema", "Problemi prioritari")
+
     with tab3:
         plot_bar(df, "rapporto", "Rapporto con l’innovazione")
+
     with tab4:
         show_wordcloud(df)
