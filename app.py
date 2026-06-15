@@ -44,6 +44,11 @@ st.markdown("""
         radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.10), transparent 36%),
         linear-gradient(135deg, #ffffff 0%, #f5f9ff 45%, #eaf4ff 100%);
     color: #0f172a;
+    color-scheme: light;
+}
+
+html {
+    color-scheme: light;
 }
 
 html, body, [class*="css"] {
@@ -203,14 +208,47 @@ label, .stRadio label, .stTextArea label {
 textarea, input {
     color: #0f172a !important;
     background-color: #ffffff !important;
+    -webkit-text-fill-color: #0f172a !important;
+    color-scheme: light;
 }
 
-div[role="radiogroup"] label {
+div[data-testid="stRadio"] {
+    color: #0f172a !important;
+    color-scheme: light;
+}
+
+div[data-testid="stRadio"] label,
+div[data-testid="stRadio"] label p,
+div[data-testid="stRadio"] label span,
+div[data-testid="stRadio"] label div {
+    color: #0f172a !important;
+    opacity: 1 !important;
+}
+
+div[data-testid="stRadio"] input[type="radio"] {
+    accent-color: #0b4f8a !important;
+    -webkit-appearance: auto;
+    appearance: auto;
+    color-scheme: light;
+}
+
+div[data-testid="stRadio"] div[role="radiogroup"] {
+    background: #ffffff;
+}
+
+div[data-testid="stRadio"] div[role="radiogroup"] > label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
     background: white;
     border: 1px solid #dbeafe;
     border-radius: 14px;
-    padding: 0.45rem 0.75rem;
+    padding: 0.55rem 0.75rem;
     margin-bottom: 0.35rem;
+}
+
+div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
+    background: #f8fbff;
 }
 
 .nav-row {
