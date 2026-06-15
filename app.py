@@ -59,6 +59,14 @@ html, body, [class*="css"] {
     display: none;
 }
 
+header[data-testid="stHeader"],
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"] {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -233,22 +241,23 @@ div[data-testid="stRadio"] input[type="radio"] {
 }
 
 div[data-testid="stRadio"] div[role="radiogroup"] {
-    background: #ffffff;
+    background: transparent !important;
 }
 
 div[data-testid="stRadio"] div[role="radiogroup"] > label {
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    background: white;
-    border: 1px solid #dbeafe;
-    border-radius: 14px;
-    padding: 0.55rem 0.75rem;
-    margin-bottom: 0.35rem;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0.15rem 0.05rem !important;
+    margin-bottom: 0.2rem !important;
+    min-height: 2rem;
 }
 
 div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
-    background: #f8fbff;
+    background: rgba(11, 79, 138, 0.04) !important;
 }
 
 .nav-row {
@@ -271,6 +280,12 @@ div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
     .hero { padding: 1.25rem; border-radius: 24px; }
     .card { padding: 1rem; border-radius: 22px; }
     .logo-img { max-width: 220px; }
+    .blue-card {
+        background: transparent;
+        box-shadow: none;
+        border-left: 7px solid #0b4f8a;
+        padding-left: 0.85rem;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
