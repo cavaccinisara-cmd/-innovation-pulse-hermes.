@@ -39,11 +39,8 @@ logo_b64 = img_to_base64(LOGO_FILE)
 
 st.markdown("""
 <style>
-:root {
+:root, html, body, .stApp {
     color-scheme: light !important;
-}
-
-html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
     background: #ffffff !important;
     color: #0f172a !important;
 }
@@ -197,48 +194,29 @@ p, span, div, label, h1, h2, h3, h4, h5, h6 {
 .stButton > button {
     width: 100%;
     border-radius: 18px;
-    padding: 1rem 1rem;
+    padding: 0.85rem 1rem;
     font-weight: 900;
-    font-size: 1.02rem;
+    font-size: 0.98rem;
     background: linear-gradient(90deg, #0b4f8a, #0284c7) !important;
     color: white !important;
-    border: none;
-    box-shadow: 0 14px 30px rgba(2,132,199,0.25);
+    border: none !important;
+    box-shadow: 0 12px 24px rgba(2,132,199,0.20);
 }
 
 .stButton > button * {
     color: white !important;
 }
 
-label, [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
-    color: #0f172a !important;
-    font-weight: 750 !important;
-}
-
 textarea, input {
     color: #0f172a !important;
     background-color: #ffffff !important;
     border-color: #bfdbfe !important;
-}
-
-/* PILLS: soluzione stabile per Safari dark mode */
-[data-testid="stPills"] button,
-[data-testid="stPills"] button *,
-[data-baseweb="button-group"] button,
-[data-baseweb="button-group"] button * {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
     -webkit-text-fill-color: #0f172a !important;
-    border: 1px solid #bfdbfe !important;
 }
 
-[data-testid="stPills"] button[aria-pressed="true"],
-[data-testid="stPills"] button[aria-pressed="true"] *,
-[data-baseweb="button-group"] button[aria-pressed="true"],
-[data-baseweb="button-group"] button[aria-pressed="true"] * {
-    background-color: #0b4f8a !important;
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] * {
+    color: #0f172a !important;
+    font-weight: 750 !important;
 }
 
 .nav-row {
@@ -255,6 +233,23 @@ textarea, input {
     border: 1px solid #bfdbfe;
     color: #0b4f8a !important;
     font-weight: 800;
+}
+
+.selected-choice {
+    background: #e0f2fe;
+    border: 1px solid #0284c7;
+    border-radius: 16px;
+    padding: 0.8rem 1rem;
+    margin: 0.5rem 0 1rem 0;
+    font-weight: 800;
+    color: #0b4f8a !important;
+}
+
+.question-title {
+    font-size: 1.02rem;
+    font-weight: 850;
+    color: #0f172a !important;
+    margin: 1rem 0 0.55rem 0;
 }
 
 @media (max-width: 768px) {
@@ -375,6 +370,29 @@ def frase_momento(df):
         return "Ogni contributo aggiunge un nodo alla mappa dell’innovazione."
 
     return random.choice(frasi)
+
+
+def choice_buttons(question, key, options, default):
+    if key not in st.session_state:
+        st.session_state[key] = default
+
+    st.markdown(f'<div class="question-title">{html.escape(question)}</div>', unsafe_allow_html=True)
+
+    cols = st.columns(2)
+
+    for i, option in enumerate(options):
+        label = f"✓ {option}" if st.session_state[key] == option else option
+        with cols[i % 2]:
+            if st.button(label, key=f"{key}_{i}"):
+                st.session_state[key] = option
+                st.rerun()
+
+    st.markdown(
+        f'<div class="selected-choice">Scelta attuale: {html.escape(st.session_state[key])}</div>',
+        unsafe_allow_html=True
+    )
+
+    return st.session_state[key]
 
 
 def build_network(df, height="720px"):
@@ -565,22 +583,25 @@ elif page == "participate":
         st.markdown('<div class="card blue-card">', unsafe_allow_html=True)
         st.subheader("Il tuo profilo")
 
-        ambito = st.pills(
+        ambito = choice_buttons(
             "Secondo te, quale ambito cambierà di più il mondo nei prossimi anni?",
+            "ambito_scelto",
             ["Intelligenza artificiale", "Energia", "Salute", "Ambiente", "Industria", "Cultura"],
-            default="Intelligenza artificiale"
+            "Intelligenza artificiale"
         )
 
-        problema = st.pills(
+        problema = choice_buttons(
             "Quale problema dovrebbe risolvere prima l’innovazione?",
+            "problema_scelto",
             ["Crisi climatica", "Disuguaglianze", "Lavoro e automazione", "Sanità", "Sicurezza", "Sostenibilità produttiva", "Qualità della vita"],
-            default="Crisi climatica"
+            "Crisi climatica"
         )
 
-        rapporto = st.pills(
+        rapporto = choice_buttons(
             "Che rapporto hai con l’innovazione?",
+            "rapporto_scelto",
             ["Entusiasmo", "Curiosità", "Fiducia cauta", "Paura", "Scetticismo"],
-            default="Curiosità"
+            "Curiosità"
         )
 
         frase = st.text_area(
