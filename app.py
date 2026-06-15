@@ -235,6 +235,39 @@ div[role="radiogroup"] label {
     .card { padding: 1rem; border-radius: 22px; }
     .logo-img { max-width: 220px; }
 }
+:root {
+    color-scheme: light !important;
+}
+
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+* {
+    color-scheme: light !important;
+}
+
+p, span, div, label, h1, h2, h3, h4, h5, h6 {
+    color: #0f172a;
+}
+
+.stMarkdown, .stText, .stRadio, .stTextArea, .stTabs {
+    color: #0f172a !important;
+}
+
+textarea, input, select {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #bfdbfe !important;
+}
+
+div[role="radiogroup"] label,
+[data-testid="stTextArea"] textarea,
+[data-testid="stWidgetLabel"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
